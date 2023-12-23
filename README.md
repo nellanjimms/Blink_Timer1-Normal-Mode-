@@ -5,8 +5,8 @@ The code utilizes the Timer1 module to introduce a delay of approximately 200ms 
 ## Functionality
 The program accomplishes the following tasks:
 
-1. Sets all bits of PORTD as output.
-2. Enters a loop where it turns ON and OFF the first bit (bit 0) of PORTD, creating a blinking effect.
+1. Sets all bits of PORTB as output.
+2. Enters a loop where it turns ON and OFF the first bit (bit 0) of PORTB, creating a blinking effect.
 3. Implements a delay using the Timer1 module to control the time between LED state changes.
 4. The delay_timer subroutine is used to introduce a delay of approximately 200ms.
 
