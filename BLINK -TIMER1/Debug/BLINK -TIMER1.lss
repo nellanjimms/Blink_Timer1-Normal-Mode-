@@ -1,12 +1,12 @@
 
-AVRASM ver. 2.2.8  C:\Users\User\Desktop\SCHOOL WORK\4.2\MICROCONTROLLER PROGRAMMING\CAT-TAKEAWAY\BLINK -TIMER1\BLINK -TIMER1\main.asm Mon Dec 18 12:16:51 2023
+AVRASM ver. 2.2.8  C:\Users\User\Desktop\PROJECTS\AVR ASSEMBLY\BLINK -TIMER1(Normal Mode)\BLINK -TIMER1\main.asm Sat Dec 23 12:54:31 2023
 
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\m328Pdef.inc'
-C:\Users\User\Desktop\SCHOOL WORK\4.2\MICROCONTROLLER PROGRAMMING\CAT-TAKEAWAY\BLINK -TIMER1\BLINK -TIMER1\main.asm(1): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\m328pdef.inc'
+C:\Users\User\Desktop\PROJECTS\AVR ASSEMBLY\BLINK -TIMER1(Normal Mode)\BLINK -TIMER1\main.asm(2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\m328pdef.inc'
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\m328Pdef.inc'
-C:\Users\User\Desktop\SCHOOL WORK\4.2\MICROCONTROLLER PROGRAMMING\CAT-TAKEAWAY\BLINK -TIMER1\BLINK -TIMER1\main.asm(1): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\m328pdef.inc'
+C:\Users\User\Desktop\PROJECTS\AVR ASSEMBLY\BLINK -TIMER1(Normal Mode)\BLINK -TIMER1\main.asm(2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\m328pdef.inc'
                                  
-                                 .include "m328pdef.inc"
+                                 ; Include the ATmega328P definition file
                                  
                                  ;***** Created: 2011-02-09 12:03 ******* Source: ATmega328P.xml **********
                                  ;*************************************************************************
@@ -987,6 +987,7 @@ C:\Users\User\Desktop\SCHOOL WORK\4.2\MICROCONTROLLER PROGRAMMING\CAT-TAKEAWAY\B
                                  
                                  ; ***** END OF FILE ******************************************************
                                  
+                                 .include "m328pdef.inc"
                                  
                                  ;***** Created: 2011-02-09 12:03 ******* Source: ATmega328P.xml **********
                                  ;*************************************************************************
@@ -1035,36 +1036,38 @@ C:\Users\User\Desktop\SCHOOL WORK\4.2\MICROCONTROLLER PROGRAMMING\CAT-TAKEAWAY\B
                                  .org 0x0000
                                  
                                  start:
-000000 ef0f                      	ldi r16, 0xFF
-000001 b90a                      	out DDRD, r16
-                                 	
+000000 ef0f                          ldi r16, 0xFF
+000001 b904                          out DDRB, r16		; Set all bits of PORTD as output
+                                     
                                  loop:
-000002 9a58                      	sbi PORTD, 0
-000003 940e 0009                 	call delay_timer
-000005 9858                      	cbi PORTD, 0
-000006 940e 0009                 	call delay_timer
-000008 cff9                      	rjmp loop
+000002 9a28                          sbi PORTB, 0		; Set bit 0 of PORTD to high
+000003 940e 0009                     call delay_timer	; Call the delay_timer subroutine
+000005 9828                          cbi PORTB, 0		; Clear bit 0 of PORTD to low
+000006 940e 0009                     call delay_timer	; Call the delay_timer subroutine again
+000008 cff9                          rjmp loop			; Jump back to the loop
                                  
-                                 delay_timer:
-                                 ;200ms delay
-                                 	.equ Count = 62411
-000009 ef13                      	ldi r17, High(Count) ;Load higher bytes of count into r17
-00000a 9310 0085                 	sts TCNT1H, r17
-00000c ec2b                      	ldi r18, low(Count) ;Load lower bytes of count into r17
-00000d 9320 0084                 	sts TCNT1L, r18
-00000f e030                      	ldi r19, 0X00
-000010 9330 0080                 	sts TCCR1A, r19		;set timer to normal mode 
-000012 e035                      	ldi r19, (1<<CS12) | (1<<CS10)	;prescaler of 1024
-000013 9330 0081                 	sts TCCR1B, r19
+                                 delay_timer:	
+                                     .equ Count = 65000	; Define the count for a 200ms delay
+000009 ef1d                          ldi r17, High(Count) ; Load the higher bytes of Count into r17
+00000a 9310 0085                     sts TCNT1H, r17		; Store the value in r17 into the higher bytes of TCNT1
+00000c ee28                          ldi r18, Low(Count)  ; Load the lower bytes of Count into r18
+00000d 9320 0084                     sts TCNT1L, r18		; Store the value in r18 into the lower bytes of TCNT1
+00000f e030                          ldi r19, 0x00		; Initialize r19 to 0x00
+000010 9330 0080                     sts TCCR1A, r19		 ; Set TCCR1A to normal mode
+000012 e035                          ldi r19, (1<<CS12) | (1<<CS10)	
+000013 9330 0081                     sts TCCR1B, r19		; Set TCCR1B with a prescaler of 1024 (1<<CS12) | (1<<CS10)
+                                     
                                  lp:
-000015 9bb0                      	sbis TIFR1, TOV1
-000016 cffe                      	rjmp lp
-000017 9ab0                      	sbi TIFR1, TOV1
-000018 ef4f                      	ldi r20, 0xFF
-000019 9340 0081                 	sts TCCR1B, r20
-00001b 9508                      	ret
-                                 
-                                 
+                                     ; Wait for TOV1 flag to be set (overflow flag)
+000015 9bb0                          sbis TIFR1, TOV1
+000016 cffe                          rjmp lp
+                                     ; Clear TOV1 flag
+000017 9ab0                          sbi TIFR1, TOV1
+                                     ; Set TCCR1B to 0xFF to stop the timer
+000018 ef4f                          ldi r20, 0xFF
+000019 9340 0081                     sts TCCR1B, r20
+                                     ; Return from the subroutine
+00001b 9508                          ret
 
 
 RESOURCE USE INFORMATION
